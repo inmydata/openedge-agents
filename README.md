@@ -4,14 +4,13 @@
 
 
 
-# Agent SDK
+# OpenEdge Agent SDK
 
-The inmydata agent SDK enables you to build AI agents that can rapidly access data from the inmydata platform. 
+The inmydata OpenEdge agent SDK enables you to build AI agents that can rapidly access data from the PAS and Classic AppServer instances. 
 
 
 ## Features
 
-- Conversational data interface - retrieve data with natural language queries
 - Structured data interface - rapidly build data interfaces for you AI agents 
 - Calendar assistant - empower your AI agent with detailed knowledge of your financial calendars
 
@@ -21,7 +20,7 @@ The inmydata agent SDK enables you to build AI agents that can rapidly access da
 Install the inmydata agent SDK with pip
 
 ```bash
-  pip install inmydata
+  pip install inmydata-openedge
 ```
     
 ## Documentation
@@ -117,7 +116,9 @@ df = driver.get_data_simple(
     ["Sales Person","Sales Value"], # List of fields we want to extract
     filter, # Filters to apply
     False, # Whether filters are case sensitive
-    TopNOptions) # Apply the Top 10 Sales People based on Sales Value filter
+    TopNOptions, # Apply the Top 10 Sales People based on Sales Value filter
+    SummaryRequest, # True if the request is one that should summarize data, false if it should retrieve unsummarized records
+    System) # The name of the system the subject is in that should be used to get the data 
 
 print(df)
 
@@ -155,81 +156,6 @@ df = driver.get_data(
 
 print(df)
 
-# -- Use get_chart to generate a chart based on the data -- see https://developer.inmydata.com/support/solutions/articles/36000577995-displaying-charts-generated-by-agentic-ai-workflows
-
-# Build our filter
-filter = [] 
-filter.append(
-    AIDataFilter(
-        "Store",
-        ConditionOperator.Equals, # Condition to use in the filter
-        LogicalOperator.And, # Logical operator to use in the filter
-        "Edinburgh", # Value to filter by
-        0, # Number of brackets before this condition
-        0, # Number of brackets after this condition
-        False # Whether the filter is case sensitive
-    )
-)
-filter.append(
-    AIDataFilter(
-        "Financial Year",
-        ConditionOperator.Equals, # Condition to use in the filter
-        LogicalOperator.And, # Logical operator to use in the filter
-        "2025", # Value to filter by
-        0, # Number of brackets before this condition
-        0, # Number of brackets after this condition
-        False # Whether the filter is case sensitive
-    )
-)
-
-# Build a TopN filter to only show the Top 10 Sales People based on Sales Value
-TopN = TopNOption("Sales Value", 10) # Field to order by and number of records to return (Positive for TopN, negative for BottomN)
-TopNOptions = {}
-TopNOptions["Sales Person"] = TopN # Apply the Top N option to the Sales Person field
-
-chartId = driver.get_chart(
-    "Inmystore Sales", # Name of the subject we want to extract data from
-    ["Sales Person"], # Chart row fields
-    [], # Chart Column Fields
-    ["Sales Value"], # Chart value fields
-    filter, # Filters to apply
-    ChartType.Bar, # Type of chart to generate
-    "Top 10 Sales People in Edinburgh for 2025", # Title of the chart
-    TopNOptions, # Apply the Top 10 Sales People based on Sales Value filter
-)
-```
-
-Example of retrieving conversational data
-
-```python
-import os
-
-from dotenv import load_dotenv
-from inmydata.ConversationalData import ConversationalDataDriver
-import asyncio
-
-load_dotenv()
-
-# get_answer is an async function, so we need to run it in an event loop
-async def main():
-    driver = ConversationalDataDriver(os.environ['INMYDATA_TENANT'])
-
-    # Register a callback to handle AI question updates
-    def on_ai_question_update(caller, message):  
-        print(message)
-
-    # Register the callback handler for AI question updates
-    driver.on("ai_question_update", on_ai_question_update) 
-
-    question = "Give me the top 10 stores this year"
-    answer = await driver.get_answer(question)
-    
-    print("=================================================================")
-    print(f"The answer was: {answer.answer}")
-    print(f"The subject used to generate the answer was: {answer.subject}")
-
-
-asyncio.run(main())
 ```
 
 Example of retrieving calendar periods
