@@ -6,10 +6,10 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'agents'
+project = 'openedge-agents'
 copyright = '2025, DataPA Limited'
 author = 'DataPA Limited'
-release = '0.0.18'
+release = '0.0.01'
 
 import os
 import sys
